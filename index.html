@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FinFlow</title>
-  <link rel="manifest" href="./manifest.json">
+<link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#2c2a26">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FinFlow">
-<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
@@ -96,6 +96,13 @@ body{font-family:var(--sans);font-weight:400;background:var(--bg);color:var(--te
 .kpi-val{font-family:var(--sans);font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1}
 .kpi-val.pos{color:var(--entrada)}.kpi-val.neg{color:var(--saida)}
 .kpi-sub{font-size:12px;color:var(--muted2);margin-top:4px}
+/* mascote */
+.mascot-kpi{display:flex;align-items:center;gap:16px}
+.mascot-kpi .kpi-info{flex:1}
+.mascot-svg{width:72px;height:72px;flex-shrink:0;transition:transform .2s}
+.mascot-svg.bounce{animation:mascot-bounce .3s ease}
+@keyframes mascot-bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
 
 /* charts */
 .chart-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
@@ -589,6 +596,54 @@ async function loadDash() {
   } catch { if (sp) sp.style.display='none'; renderKPIs(null); }
 }
 
+
+function mascotSVG(saldo, metaEstourada) {
+  let mood;
+  if (metaEstourada) mood = 'assustado';
+  else if (saldo > 500) mood = 'comemorando';
+  else if (saldo >= 0) mood = 'feliz';
+  else mood = 'triste';
+
+  const moods = {
+    feliz:       {browL:'M58 46 Q66 43 72 46',browR:'M88 46 Q94 43 102 46',mouth:'M66 74 Q80 86 94 74',eyeY:10,coins:0,sweat:0,zzz:0,alert:0,cheek:.25,eyeLX:67,eyeRX:95},
+    comemorando: {browL:'M56 43 Q66 38 72 43',browR:'M88 43 Q94 38 104 43',mouth:'M64 72 Q80 88 96 72',eyeY:5, coins:1,sweat:0,zzz:0,alert:0,cheek:.45,eyeLX:67,eyeRX:95},
+    triste:      {browL:'M58 50 Q66 48 72 50',browR:'M88 50 Q94 48 102 50',mouth:'M68 80 Q80 73 92 80',eyeY:8, coins:0,sweat:1,zzz:0,alert:0,cheek:.1, eyeLX:66,eyeRX:94},
+    assustado:   {browL:'M58 51 Q65 44 72 51',browR:'M88 51 Q95 44 102 51',mouth:'M70 79 Q80 86 90 79',eyeY:13,coins:0,sweat:0,zzz:0,alert:1,cheek:.05,eyeLX:66,eyeRX:94},
+    dormindo:    {browL:'M58 48 Q66 46 72 48',browR:'M88 48 Q94 46 102 48',mouth:'M70 76 Q80 80 90 76',eyeY:1.2,coins:0,sweat:0,zzz:1,alert:0,cheek:.15,eyeLX:67,eyeRX:95},
+  };
+  const m = moods[mood] || moods.feliz;
+  return `<svg class="mascot-svg" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg" onclick="this.classList.add('bounce');setTimeout(()=>this.classList.remove('bounce'),300)" style="cursor:pointer">
+    <ellipse cx="80" cy="98" rx="42" ry="36" fill="#c9c4ba"/>
+    <ellipse cx="80" cy="112" rx="28" ry="14" fill="#b4b2a9" opacity="0.6"/>
+    <circle cx="80" cy="62" r="38" fill="#d3d1c7"/>
+    <ellipse cx="48" cy="38" rx="11" ry="14" fill="#d3d1c7"/>
+    <ellipse cx="48" cy="38" rx="6" ry="8" fill="#c9c4ba"/>
+    <ellipse cx="112" cy="38" rx="11" ry="14" fill="#d3d1c7"/>
+    <ellipse cx="112" cy="38" rx="6" ry="8" fill="#c9c4ba"/>
+    <ellipse cx="56" cy="70" rx="9" ry="6" fill="#c0392b" opacity="${m.cheek}"/>
+    <ellipse cx="104" cy="70" rx="9" ry="6" fill="#c0392b" opacity="${m.cheek}"/>
+    <ellipse cx="66" cy="58" rx="9" ry="${m.eyeY}" fill="white"/>
+    <circle cx="${m.eyeLX}" cy="59" r="5.5" fill="#2c2a26"/>
+    <circle cx="${m.eyeLX+2}" cy="57" r="1.8" fill="white"/>
+    <ellipse cx="94" cy="58" rx="9" ry="${m.eyeY}" fill="white"/>
+    <circle cx="${m.eyeRX}" cy="59" r="5.5" fill="#2c2a26"/>
+    <circle cx="${m.eyeRX+2}" cy="57" r="1.8" fill="white"/>
+    <path d="${m.browL}" stroke="#2c2a26" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="${m.browR}" stroke="#2c2a26" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="${m.mouth}" stroke="#2c2a26" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="36" cy="102" rx="10" ry="16" fill="#d3d1c7" transform="rotate(-20,36,102)"/>
+    <ellipse cx="124" cy="102" rx="10" ry="16" fill="#d3d1c7" transform="rotate(20,124,102)"/>
+    <ellipse cx="38" cy="130" rx="14" ry="9" fill="#b4b2a9"/>
+    <ellipse cx="122" cy="130" rx="14" ry="9" fill="#b4b2a9"/>
+    ${m.coins ? `<g><circle cx="52" cy="28" r="9" fill="#1a7a4a" stroke="#0f5c36" stroke-width="1.5"/><text x="52" y="32" text-anchor="middle" font-size="9" font-weight="700" fill="#e1f5ee">R$</text><circle cx="108" cy="22" r="7" fill="#1a7a4a" stroke="#0f5c36" stroke-width="1.5"/><circle cx="80" cy="14" r="8" fill="#1a7a4a" stroke="#0f5c36" stroke-width="1.5"/></g>` : ''}
+    ${m.sweat ? `<g><ellipse cx="118" cy="48" rx="5" ry="7" fill="#85B7EB"/><ellipse cx="122" cy="56" rx="3" ry="5" fill="#85B7EB"/></g>` : ''}
+    ${m.zzz ? `<g><text x="110" y="36" font-size="14" font-weight="700" fill="#7a7670">z</text><text x="120" y="26" font-size="11" font-weight="700" fill="#7a7670">z</text></g>` : ''}
+    ${m.alert ? `<g><circle cx="116" cy="30" r="11" fill="#c0392b"/><text x="116" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="white">!</text></g>` : ''}
+  </svg>`;
+}
+
+let lastPorCategoria = {};
+
 function renderKPIs(s) {
   const g = document.getElementById('kpiRow');
   if (!s) {
@@ -601,12 +656,25 @@ function renderKPIs(s) {
   }
   const f = v => 'R$ ' + parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2});
   const saldo = (s.entradas?.mes||0)-(s.saidas?.mes||0)-(s.parcelas?.mes||0)-(s.assinaturas?.mes||0);
+  const metaEstourada = metas.some(m => {
+    const gasto = (lastPorCategoria||{})[m.categoria]||0;
+    return m.meta > 0 && gasto >= m.meta;
+  });
   g.innerHTML = `
     <div class="kpi k-saida"><div class="kpi-lbl">Saídas</div><div class="kpi-val neg">${f(s.saidas?.mes)}</div><div class="kpi-sub">${s.saidas?.count||0} lançamentos</div></div>
     <div class="kpi k-entrada"><div class="kpi-lbl">Entradas</div><div class="kpi-val pos">${f(s.entradas?.mes)}</div><div class="kpi-sub">${s.entradas?.count||0} lançamentos</div></div>
     <div class="kpi k-parcela"><div class="kpi-lbl">Parcelas/mês</div><div class="kpi-val neg">${f(s.parcelas?.mes)}</div><div class="kpi-sub">${s.parcelas?.count||0} ativas</div></div>
     <div class="kpi k-assin"><div class="kpi-lbl">Assinaturas</div><div class="kpi-val neg">${f(s.assinaturas?.mes)}</div><div class="kpi-sub">${s.assinaturas?.count||0} serviços</div></div>
-    <div class="kpi k-saldo"><div class="kpi-lbl">Saldo estimado</div><div class="kpi-val ${saldo>=0?'pos':'neg'}">${f(saldo)}</div><div class="kpi-sub">entradas − saídas − fixos</div></div>`;
+    <div class="kpi k-saldo">
+      <div class="mascot-kpi">
+        <div class="kpi-info">
+          <div class="kpi-lbl">Saldo estimado</div>
+          <div class="kpi-val ${saldo>=0?'pos':'neg'}">${f(saldo)}</div>
+          <div class="kpi-sub">entradas − saídas − fixos</div>
+        </div>
+        ${mascotSVG(saldo, metaEstourada)}
+      </div>
+    </div>`;
 }
 
 function renderMetasDash(porCategoria) {
@@ -632,6 +700,7 @@ function renderMetasDash(porCategoria) {
 }
 
 function renderCharts(porMes, porForma, saidas) {
+  lastPorCategoria = arguments[3] || {};
   const C = ['#c0392b','#e07030','#d4a030','#1a7a4a','#1a4fa8','#6a1a8a','#a84a00','#2c7a8a'];
   const cats = {};
   (saidas||[]).forEach(r => {
@@ -957,16 +1026,22 @@ function tagStatus(s){if(!s)return'—';const c=s==='Ativo'?'t-ok':s==='Cancelad
 window.addEventListener('DOMContentLoaded',()=>{
   if(URL_API){
     const a=document.getElementById('apiUrl'),b=document.getElementById('apiUrlM');
-    if(a)a.value=URL_API;if(b)b.value=URL_API;setConn('ok');
+    if(a)a.value=URL_API;if(b)b.value=URL_API;
   }
   updateMonthLabel();
-  renderKPIs(null);
+  // Carrega dados automaticamente se URL já configurada
+  if(URL_API) loadDash();
+  else renderKPIs(null);
+  // Recarrega ao voltar para a aba
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'&&URL_API&&current==='dashboard') loadDash();
+  });
+  // Registra Service Worker para PWA
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  }
 });
-</script>
-  <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js').catch(()=>{});
-}
 </script>
 </body>
 </html>
+<!-- PWA já configurado no head via manifest.json e sw.js -->
